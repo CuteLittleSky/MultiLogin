@@ -4,7 +4,14 @@ plugins {
     id("java")
 }
 
-val outputSha256 by tasks.registering {
+dependencies {
+    compileOnly(project(":logger"))
+
+    testImplementation("junit:junit:4.13.1")
+    testImplementation(project(":logger"))
+}
+
+val handleLibraries by tasks.registering {
     doLast {
         val dependenciesSha256 =
             rootProject.configurations.compileClasspath.get().resolvedConfiguration.resolvedArtifacts.map { artifact ->
@@ -17,18 +24,18 @@ val outputSha256 by tasks.registering {
                             }
                         }
             }
-
         rootProject.file(".digests").writeText(dependenciesSha256.joinToString("\n"))
     }
 }
 
 tasks.processResources {
-    dependsOn(outputSha256)
+    dependsOn(handleLibraries)
 }
 
 
 tasks.processResources {
     from(rootDir){
         include(".digests")
+        include("repositories")
     }
 }

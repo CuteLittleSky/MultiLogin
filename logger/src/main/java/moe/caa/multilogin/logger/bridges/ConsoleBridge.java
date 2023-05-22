@@ -15,12 +15,18 @@ public class ConsoleBridge implements Logger {
     public void log(Level level, String message, Throwable throwable) {
         String format = String.format("[%s] %s", level.name(), message);
 
-        PrintStream printStream = switch (level) {
-            case TRACE, DEBUG, INFO -> System.out;
-            default -> System.err;
-        };
+        PrintStream printStream;
+        switch (level) {
+            case TRACE:
+            case DEBUG:
+            case INFO:
+                printStream = System.out;
+                break;
+            default:
+                printStream = System.err;
+        }
         printStream.println(format);
-        if (throwable != null){
+        if (throwable != null) {
             throwable.printStackTrace(printStream);
         }
     }

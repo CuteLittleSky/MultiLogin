@@ -1,14 +1,18 @@
-import java.nio.file.Files
-import java.security.MessageDigest
-
 plugins {
     java
     id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
     id("com.github.johnrengelman.shadow") version "8.1.0" apply false
 }
 
+
+repositories {
+    maven("https://maven.aliyun.com/repository/public")
+    maven("https://repo1.maven.org/maven2")
+    maven("https://libraries.minecraft.net")
+}
+
 dependencies {
-    compileOnly("com.zaxxer", "HikariCP",  "4.0.3")
+    compileOnly("com.zaxxer", "HikariCP", "4.0.3")
     compileOnly("com.google.code.gson", "gson", "2.8.8")
     compileOnly("org.spongepowered", "configurate-yaml", "4.1.2")
     compileOnly("org.spongepowered", "configurate-core", "4.1.2")
