@@ -7,7 +7,6 @@ plugins {
 dependencies {
     compileOnly(project(":logger"))
 
-    testImplementation("junit:junit:4.13.1")
     testImplementation(project(":logger"))
 }
 
