@@ -16,15 +16,20 @@ allprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
-        compileOnly("com.zaxxer", "HikariCP", "5.0.1")
-        compileOnly("org.ktorm", "ktorm-core", "3.6.0")
-        compileOnly("mysql:mysql-connector-java:8.0.33")
-        compileOnly("com.google.code.gson", "gson", "2.8.8")
-        compileOnly("org.spongepowered", "configurate-yaml", "4.1.2")
-        compileOnly("org.spongepowered", "configurate-core", "4.1.2")
-        compileOnly("org.yaml", "snakeyaml", "1.33")
-        compileOnly("com.squareup.okhttp3", "okhttp", "4.10.0")
-        compileOnly("com.mojang", "brigadier", "1.0.18")
+        // sql
+        testImplementation(compileOnly("com.zaxxer", "HikariCP", "5.0.1"))
+        testImplementation(compileOnly("org.ktorm", "ktorm-core", "3.6.0"))
+        testImplementation(compileOnly("mysql", "mysql-connector-java", "8.0.33"))
+
+        // config
+        testImplementation(compileOnly("org.spongepowered", "configurate-yaml", "4.1.2"))
+        testImplementation(compileOnly("org.spongepowered", "configurate-core", "4.1.2"))
+        testImplementation(compileOnly("org.yaml", "snakeyaml", "1.33"))
+
+        testImplementation(compileOnly("com.google.code.gson", "gson", "2.8.8"))
+        testImplementation(compileOnly("com.squareup.okhttp3", "okhttp", "4.10.0"))
+        testImplementation(compileOnly("com.mojang", "brigadier", "1.0.18"))
+
 
         testImplementation("junit:junit:4.13.1")
     }
