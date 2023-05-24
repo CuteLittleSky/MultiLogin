@@ -1,7 +1,11 @@
+import groovy.json.JsonOutput
+
+version = "0.7.0-ALPHA.1"
+
 plugins {
     java
     id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.0" apply false
+    id("net.nemerosa.versioning") version "3.0.0" apply false
 }
 
 repositories {
@@ -49,8 +53,25 @@ allprojects {
 subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
-
     }
 
+    tasks.withType<Jar>(){
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 
+    tasks.processResources{
+        val contributors = HashSet<String>()
+
+        File(rootDir, "contributors").readLines().forEach {
+            if (it.trim().isNotEmpty() && (it[0] != '#')) contributors.add(it)
+        }
+
+
+        filter { it
+            .replace("@contributors_json@", JsonOutput.toJson(contributors))
+            .replace("@contributors@", contributors.joinToString { ", " })
+            .replace("@build_timestamp@", System.currentTimeMillis().toString())
+            .replace("@version@", rootProject.version.toString())
+        }
+    }
 }

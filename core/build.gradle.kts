@@ -5,6 +5,11 @@ plugins {
 
 dependencies {
     compileOnly(project(":logger"))
-
     testImplementation(project(":logger"))
+}
+
+tasks {
+    jar {
+        archiveFileName.set("MultiLogin-Core.JarFile")
+    }
 }

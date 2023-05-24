@@ -111,6 +111,10 @@ public class PluginLoader {
         classLoader.close();
     }
 
+    public void addURL(URL url){
+        classLoader.addURL(url);
+    }
+
     private String calcSha256(File file) throws NoSuchAlgorithmException, IOException {
         MessageDigest instance = MessageDigest.getInstance("SHA-256");
         instance.update(Files.readAllBytes(file.toPath()));
