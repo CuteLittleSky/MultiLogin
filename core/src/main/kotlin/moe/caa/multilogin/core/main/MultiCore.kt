@@ -1,12 +1,16 @@
 package moe.caa.multilogin.core.main
 
+import moe.caa.multilogin.loader.core.IMultiCore
+import moe.caa.multilogin.loader.plugin.IPlugin
 import moe.caa.multilogin.logger.LoggerProvider
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 
-class MultiCore {
+class MultiCore(
+    private val plugin: IPlugin
+) : IMultiCore {
 
     private fun showBanner() {
         //show banner
@@ -18,8 +22,12 @@ class MultiCore {
         LoggerProvider.getLogger().info("\u001b[40;35m                                 |___/         \u001b[0m")
     }
 
-    fun init() {
+    override fun init() {
         showBanner()
+    }
+
+    override fun close() {
+        executorService.shutdownNow()
     }
 
     companion object {

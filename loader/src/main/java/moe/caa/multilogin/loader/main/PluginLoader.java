@@ -1,18 +1,24 @@
 package moe.caa.multilogin.loader.main;
 
 import moe.caa.multilogin.loader.classloader.PriorAllURLClassLoader;
+import moe.caa.multilogin.loader.core.IMultiCore;
 import moe.caa.multilogin.loader.exception.InitialFailedException;
 import moe.caa.multilogin.loader.exception.LibraryException;
 import moe.caa.multilogin.loader.library.Library;
+import moe.caa.multilogin.loader.plugin.IPlugin;
 import moe.caa.multilogin.logger.LoggerProvider;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 表示插件加载器
@@ -48,15 +54,23 @@ public class PluginLoader {
         }
     }
 
-    private final File librariesFolder;
+    private final IPlugin plugin;
 
     private final PriorAllURLClassLoader classLoader = new PriorAllURLClassLoader(PluginLoader.class.getClassLoader(), List.of(
             "moe.caa.multilogin."
     ));
     private final Set<Library> loaded = new HashSet<>();
 
-    public PluginLoader(File librariesFolder) {
-        this.librariesFolder = librariesFolder;
+    private final AtomicReference<IMultiCore> multiCoreAtomicReference = new AtomicReference<>();
+
+    public PluginLoader(IPlugin plugin) throws IOException {
+        this.plugin = plugin;
+        if (!plugin.getLibrariesFolder().exists()) {
+            Files.createDirectories(plugin.getLibrariesFolder().toPath());
+        }
+        if (!plugin.getTempFolder().exists()) {
+            Files.createDirectories(plugin.getTempFolder().toPath());
+        }
     }
 
     private static byte[] getBytes(URL url) throws IOException {
@@ -74,13 +88,26 @@ public class PluginLoader {
         throw new IOException(String.valueOf(httpURLConnection.getResponseCode()));
     }
 
+    public void loadNestCoreJar() throws IOException {
+        loadNestJar("MultiLogin-Core");
+    }
+
+    public void loadNestJar(String s) throws IOException {
+        Path path = Files.createTempFile(plugin.getTempFolder().toPath(), null, null);
+        try (InputStream stream = Objects.requireNonNull(PluginLoader.class.getClassLoader().getResourceAsStream(s))) {
+            Files.write(path, stream.readAllBytes(), StandardOpenOption.CREATE);
+        }
+        addURL(path.toFile().toURI().toURL());
+        path.toFile().deleteOnExit();
+    }
+
     public void loadLibrary(Library library) throws Exception {
         if (loaded.contains(library)) {
             return;
         }
         String digest = libraryDigestMap.get(library);
         if (digest == null) throw new LibraryException(String.format("No digest value found for library %s.", library));
-        File libraryFile = library.getFile(librariesFolder);
+        File libraryFile = library.getFile(plugin.getLibrariesFolder());
         if (libraryFile.exists()) {
             if (digest.equals(calcSha256(libraryFile))) {
                 classLoader.addURL(libraryFile.toURI().toURL());
@@ -107,11 +134,32 @@ public class PluginLoader {
         }
     }
 
+    public Class<?> findClass(String className) throws ClassNotFoundException {
+        return classLoader.loadClass(className);
+    }
+
     public void close() throws IOException {
         classLoader.close();
     }
 
-    public void addURL(URL url){
+    public IMultiCore getMultiCore() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        IMultiCore multiCore = multiCoreAtomicReference.get();
+        if (multiCore != null) {
+            return multiCore;
+        }
+        synchronized (multiCoreAtomicReference) {
+            multiCore = multiCoreAtomicReference.get();
+            if (multiCore != null) {
+                return multiCore;
+            }
+            multiCoreAtomicReference.set(
+                    multiCore = ((IMultiCore) findClass("moe.caa.multilogin.core.main.MultiCore").getConstructor(IPlugin.class).newInstance(plugin))
+            );
+            return multiCore;
+        }
+    }
+
+    public void addURL(URL url) {
         classLoader.addURL(url);
     }
 
@@ -143,5 +191,11 @@ public class PluginLoader {
             }
         }
         throw new LibraryException("Library download failed.", exception);
+    }
+
+    public void loadCoreLibraries() throws Exception {
+        // kotlin runtime
+        loadLibrary(new Library("org.jetbrains.kotlin", "kotlin-stdlib", "1.8.21"));
+        loadLibrary(new Library("org.jetbrains.kotlin", "kotlin-stdlib-common", "1.8.21"));
     }
 }

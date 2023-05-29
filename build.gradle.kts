@@ -22,7 +22,8 @@ allprojects {
     dependencies {
         // sql
         testImplementation(compileOnly("com.zaxxer", "HikariCP", "5.0.1"))
-        testImplementation(compileOnly("org.ktorm", "ktorm-core", "3.6.0"))
+        testImplementation(compileOnly("org.jetbrains.exposed", "exposed-core", "0.41.1"))
+        testImplementation(compileOnly("org.jetbrains.exposed", "exposed-jdbc", "0.41.1"))
         testImplementation(compileOnly("mysql", "mysql-connector-java", "8.0.33"))
 
         // config
@@ -33,6 +34,10 @@ allprojects {
         testImplementation(compileOnly("com.google.code.gson", "gson", "2.8.8"))
         testImplementation(compileOnly("com.squareup.okhttp3", "okhttp", "4.10.0"))
         testImplementation(compileOnly("com.mojang", "brigadier", "1.0.18"))
+
+        // kotlin runtime
+        testImplementation(compileOnly("org.jetbrains.kotlin", "kotlin-stdlib", "1.8.21"))
+        testImplementation(compileOnly("org.jetbrains.kotlin", "kotlin-stdlib-common", "1.8.21"))
 
 
         testImplementation("junit:junit:4.13.1")
@@ -55,7 +60,7 @@ subprojects {
         options.encoding = Charsets.UTF_8.name()
     }
 
-    tasks.withType<Jar>(){
+    tasks.withType<Jar> {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 

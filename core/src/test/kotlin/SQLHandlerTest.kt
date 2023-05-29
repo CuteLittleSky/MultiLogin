@@ -1,9 +1,7 @@
-package moe.caa.multilogin.core.database
-
+import moe.caa.multilogin.core.database.SQLHandler
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.Test
-import org.ktorm.dsl.forEach
-import org.ktorm.dsl.from
-import org.ktorm.dsl.select
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 class SQLHandlerTest {
@@ -22,12 +20,13 @@ class SQLHandlerTest {
         """.trimIndent()
         )
 
-
         val sqlHandler = SQLHandler()
         sqlHandler.init(build)
-        sqlHandler.database.from(sqlHandler.userData)
-            .select(sqlHandler.userData.onlineUUID).forEach {
-                println(it[sqlHandler.userData.onlineUUID])
+
+        transaction {
+            sqlHandler.inGameProfile.selectAll().forEach {
+                println(it[sqlHandler.inGameProfile.inGameUUID])
             }
+        }
     }
 }

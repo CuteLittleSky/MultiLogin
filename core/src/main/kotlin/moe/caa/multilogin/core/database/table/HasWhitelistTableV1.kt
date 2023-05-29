@@ -1,13 +1,10 @@
 package moe.caa.multilogin.core.database.table
 
-import moe.caa.multilogin.core.toBytes
-import moe.caa.multilogin.core.toUUID
-import org.ktorm.schema.Table
-import org.ktorm.schema.bytes
-import org.ktorm.schema.int
+import org.jetbrains.exposed.sql.Table
 
-class HasWhitelistTableV1(tableName: String) : Table<Nothing>(tableName) {
-    val onlineUUID = bytes("online_uuid").primaryKey()
-        .transform({ it.toUUID() }, { it.toBytes() })
-    val serviceId = int("service_id").primaryKey()
+class HasWhitelistTableV1(tableName: String) : Table(tableName) {
+    val onlineUUID = uuid("online_uuid")
+    val serviceId = integer("service_id")
+
+    override val primaryKey = PrimaryKey(onlineUUID, serviceId)
 }

@@ -5,7 +5,10 @@ import com.zaxxer.hikari.HikariDataSource
 import moe.caa.multilogin.core.database.table.*
 import moe.caa.multilogin.core.toProperties
 import moe.caa.multilogin.logger.LoggerProvider
-import org.ktorm.database.Database
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.spongepowered.configurate.ConfigurationNode
 
 class SQLHandler {
@@ -15,7 +18,7 @@ class SQLHandler {
     lateinit var skinRestorer: SkinRestoredCacheTableV2
     lateinit var userData: UserDataTableV4
 
-    lateinit var database: Database
+    private lateinit var database: Database
     private lateinit var dataSource: HikariDataSource
 
 
@@ -32,6 +35,12 @@ class SQLHandler {
         skinRestorer = SkinRestoredCacheTableV2("${tablePrefix}skin_restored_cache_v2")
         cacheWhitelistTableV1 = CacheWhitelistTableV1("${tablePrefix}cache_whitelist_v1")
         hasWhitelistTableV1 = HasWhitelistTableV1("${tablePrefix}has_whitelist_v1")
+
+        TransactionManager.defaultDatabase = database
+
+        transaction {
+            SchemaUtils.create(userData, inGameProfile, skinRestorer, cacheWhitelistTableV1, hasWhitelistTableV1)
+        }
 
         LoggerProvider.getLogger().info("Connected to $backend.")
     }

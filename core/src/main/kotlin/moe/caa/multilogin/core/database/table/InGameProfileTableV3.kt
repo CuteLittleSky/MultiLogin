@@ -1,11 +1,11 @@
 package moe.caa.multilogin.core.database.table
 
-import org.ktorm.schema.Table
-import org.ktorm.schema.bytes
-import org.ktorm.schema.varchar
+import org.jetbrains.exposed.sql.Table
 
-class InGameProfileTableV3(tableName: String) : Table<Nothing>(tableName) {
-    val inGameUUID = bytes("in_game_uuid").primaryKey()
-    val currentUsernameLowerCase = varchar("current_username_lower_case")
-    val currentUsernameOriginal = varchar("current_username_original")
+class InGameProfileTableV3(tableName: String) : Table(tableName) {
+    val inGameUUID = uuid("in_game_uuid")
+    val currentUsernameLowerCase = varchar("current_username_lower_case", 64).uniqueIndex()
+    val currentUsernameOriginal = varchar("current_username_original", 64)
+
+    override val primaryKey = PrimaryKey(inGameUUID)
 }
