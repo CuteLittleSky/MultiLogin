@@ -29,8 +29,9 @@ allprojects {
         // config
         testImplementation(compileOnly("org.spongepowered", "configurate-yaml", "4.1.2"))
         testImplementation(compileOnly("org.spongepowered", "configurate-core", "4.1.2"))
-        testImplementation(compileOnly("org.yaml", "snakeyaml", "1.33"))
+        testImplementation(compileOnly("org.yaml", "snakeyaml", "2.0"))
 
+        testImplementation(compileOnly("io.leangen.geantyref", "geantyref", "1.3.14"))
         testImplementation(compileOnly("com.google.code.gson", "gson", "2.8.8"))
         testImplementation(compileOnly("com.squareup.okhttp3", "okhttp", "4.10.0"))
         testImplementation(compileOnly("com.mojang", "brigadier", "1.0.18"))

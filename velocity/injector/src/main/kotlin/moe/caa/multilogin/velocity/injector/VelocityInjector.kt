@@ -3,32 +3,30 @@ package moe.caa.multilogin.velocity.injector
 import com.velocitypowered.proxy.protocol.MinecraftPacket
 import com.velocitypowered.proxy.protocol.StateRegistry
 import com.velocitypowered.proxy.protocol.StateRegistry.PacketRegistry
-import com.velocitypowered.proxy.protocol.packet.EncryptionResponse
-import com.velocitypowered.proxy.protocol.packet.ServerLogin
 import moe.caa.multilogin.core.openAccess
 import moe.caa.multilogin.loader.core.IMultiCore
-import moe.caa.multilogin.loader.injector.Injector
+import moe.caa.multilogin.loader.injector.IInjector
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.function.Supplier
 
 
-class VelocityInjector : Injector {
+object VelocityInjector : IInjector {
     private val mapPut: Lazy<Method> = lazy {
         MutableMap::class.java
             .getMethod("put", Any::class.java, Any::class.java)
     }
 
 
-    override fun inject(api: IMultiCore?) {
+    override fun inject(api: IMultiCore) {
         // auth
         val stateRegistry = StateRegistry.LOGIN
         val serverboundField: Field = StateRegistry::class.java.getDeclaredField("serverbound").openAccess()
         val serverbound = serverboundField[stateRegistry] as PacketRegistry
 
 
-        redirectInput(serverbound, EncryptionResponse::class.java) { error("todo") }
-        redirectInput(serverbound, ServerLogin::class.java) { error("todo") }
+//        redirectInput(serverbound, EncryptionResponse::class.java) { error("todo") }
+//        redirectInput(serverbound, ServerLogin::class.java) { error("todo") }
     }
 
     /**

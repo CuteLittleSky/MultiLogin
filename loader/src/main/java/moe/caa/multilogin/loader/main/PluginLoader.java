@@ -4,6 +4,7 @@ import moe.caa.multilogin.loader.classloader.PriorAllURLClassLoader;
 import moe.caa.multilogin.loader.core.IMultiCore;
 import moe.caa.multilogin.loader.exception.InitialFailedException;
 import moe.caa.multilogin.loader.exception.LibraryException;
+import moe.caa.multilogin.loader.injector.IInjector;
 import moe.caa.multilogin.loader.library.Library;
 import moe.caa.multilogin.loader.plugin.IPlugin;
 import moe.caa.multilogin.logger.LoggerProvider;
@@ -140,6 +141,12 @@ public class PluginLoader {
 
     public void close() throws IOException {
         classLoader.close();
+        deleteAll(plugin.getTempFolder());
+    }
+
+    public IInjector getInjector(String className) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        Class<?> aClass = findClass(className);
+        return (IInjector) aClass.getField("INSTANCE").get(null);
     }
 
     public IMultiCore getMultiCore() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -197,5 +204,22 @@ public class PluginLoader {
         // kotlin runtime
         loadLibrary(new Library("org.jetbrains.kotlin", "kotlin-stdlib", "1.8.21"));
         loadLibrary(new Library("org.jetbrains.kotlin", "kotlin-stdlib-common", "1.8.21"));
+
+        // configuration
+        loadLibrary(new Library("org.spongepowered", "configurate-yaml", "4.1.2"));
+        loadLibrary(new Library("org.spongepowered", "configurate-core", "4.1.2"));
+        loadLibrary(new Library("org.yaml", "snakeyaml", "2.0"));
+
+        loadLibrary(new Library("io.leangen.geantyref", "geantyref", "1.3.14"));
+    }
+
+    private void deleteAll(File file) throws IOException {
+        if(!file.exists()) return;
+        if(file.isDirectory()){
+            for (File f : Optional.ofNullable(file.listFiles()).orElse(new File[0])) {
+                deleteAll(f);
+            }
+        }
+        Files.delete(file.toPath());
     }
 }

@@ -38,8 +38,8 @@ public class MultiLoginVelocity implements IPlugin {
         try {
             this.pluginLoader.loadCoreLibraries();
             this.pluginLoader.loadNestCoreJar();
-            pluginLoader.getMultiCore();
-            // velocity injector
+            this.pluginLoader.loadNestJar("MultiLogin-Velocity-Injector");
+            pluginLoader.getInjector("moe.caa.multilogin.velocity.injector.VelocityInjector").inject(pluginLoader.getMultiCore());
             initiated = true;
         } catch (Throwable throwable) {
             LoggerProvider.getLogger().fatal("An exception was encountered while initializing the plugin.", throwable);

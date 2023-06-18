@@ -1,5 +1,6 @@
 package moe.caa.multilogin.core.main
 
+import moe.caa.multilogin.core.config.PluginConfig
 import moe.caa.multilogin.loader.core.IMultiCore
 import moe.caa.multilogin.loader.plugin.IPlugin
 import moe.caa.multilogin.logger.LoggerProvider
@@ -7,10 +8,13 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
-
+/**
+ * 猫踢核心
+ */
 class MultiCore(
-    private val plugin: IPlugin
+    val plugin: IPlugin
 ) : IMultiCore {
+    val pluginConfig: PluginConfig = PluginConfig(this)
 
     private fun showBanner() {
         //show banner
@@ -24,6 +28,7 @@ class MultiCore(
 
     override fun init() {
         showBanner()
+        pluginConfig.reload()
     }
 
     override fun close() {
