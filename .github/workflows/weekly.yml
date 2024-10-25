@@ -1,7 +1,7 @@
 name: Weekly updates
 
 on:
-  push:
+  push: 
 
 jobs:
   velocity-lib:
